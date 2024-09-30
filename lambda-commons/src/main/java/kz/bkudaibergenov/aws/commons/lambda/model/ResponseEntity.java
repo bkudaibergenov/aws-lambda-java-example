@@ -26,7 +26,7 @@ public class ResponseEntity<T> {
         return statusCode;
     }
 
-    // Builder класс
+
     public static class Builder<T> {
         private T body;
         private Map<String, String> headers = new HashMap<>();

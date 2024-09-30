@@ -13,6 +13,7 @@ import software.amazon.awscdk.services.lambda.Runtime;
 import software.constructs.Construct;
 
 public class InfrastructureStack extends Stack {
+
     public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
     }
@@ -34,7 +35,7 @@ public class InfrastructureStack extends Stack {
                         .handler(lambdaFunction)
                         .build();
 
-                Resource resource = api.getRoot().addResource(lambdaDefinition.getApi().getPath().substring(1)); // удаляем начальный "/"
+                Resource resource = api.getRoot().addResource(lambdaDefinition.getApi().getPath().substring(1));
                 for (String method : lambdaDefinition.getApi().getMethods()) {
                     resource.addMethod(method, new LambdaIntegration(lambdaFunction));
                 }
