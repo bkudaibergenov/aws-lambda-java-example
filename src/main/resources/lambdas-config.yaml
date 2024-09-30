@@ -1,0 +1,8 @@
+lambdas:
+  - name: "ExampleFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.ExampleLambda::handleRequest"
+    codePath: "./lambda-examples/build/libs/example-lambda.jar"
+    api:
+      name: "ExampleApi"
+      path: "/example"
+      methods: ["GET", "POST"]

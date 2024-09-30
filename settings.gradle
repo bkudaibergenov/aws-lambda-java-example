@@ -1,0 +1,3 @@
+rootProject.name = 'aws-lambda-java-example'
+include 'lambda-commons'
+include 'lambda-examples'
