@@ -12,7 +12,7 @@ public class RegistrationLambda {
     public static void register(final Construct scope, LambdaRegistration lambdaRegistration) {
         LambdaProperties config = LambdaConfigLoader.loadLambdaProperties();
 
-        config.getLambdas().forEach(lambdaDefinition -> {
+        config.getConfig().getLambdas().forEach(lambdaDefinition -> {
             Function lambdaFunction = LambdaFunctionBuilder.buildLambdaFunction(scope, lambdaDefinition, lambdaRegistration);
 
             if (lambdaDefinition.getApi() != null) {

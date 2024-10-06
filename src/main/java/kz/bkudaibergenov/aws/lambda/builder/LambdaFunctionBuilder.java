@@ -2,6 +2,7 @@ package kz.bkudaibergenov.aws.lambda.builder;
 
 import kz.bkudaibergenov.aws.lambda.model.LambdaRegistration;
 import kz.bkudaibergenov.aws.lambda.properties.LambdaProperties;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.services.apigateway.LambdaIntegration;
 import software.amazon.awscdk.services.apigateway.LambdaRestApi;
@@ -17,13 +18,15 @@ import java.util.Optional;
 
 public class LambdaFunctionBuilder {
 
-    public static Function buildLambdaFunction(Construct scope, LambdaProperties.LambdaDefinition lambdaDefinition, LambdaRegistration lambdaRegistration) {
+    public static Function buildLambdaFunction(Construct scope,
+                                               LambdaProperties.LambdaConfig.LambdaDefinition lambdaDefinition,
+                                               LambdaRegistration lambdaRegistration) {
+
         Function.Builder lambdaFunctionBuilder = Function.Builder.create(scope, lambdaDefinition.getName())
                 .runtime(Runtime.JAVA_17)
                 .handler(lambdaDefinition.getHandler())
                 .code(Code.fromAsset(lambdaDefinition.getCodePath()))
-                .timeout(Optional.ofNullable(lambdaDefinition.getTimeout())
-                        .map(Duration::seconds).orElse(null));
+                .timeout(getTimeout(lambdaRegistration.getTimeout(), lambdaDefinition.getTimeout()));
 
         if (Boolean.TRUE.equals(lambdaDefinition.getUseVpc())) {
             if (lambdaRegistration.getVpc() == null) {
@@ -40,7 +43,7 @@ public class LambdaFunctionBuilder {
         return lambdaFunctionBuilder.build();
     }
 
-    public static void configureLambdaApi(Construct scope, Function lambdaFunction, LambdaProperties.ApiDefinition apiDefinition) {
+    public static void configureLambdaApi(Construct scope, Function lambdaFunction, LambdaProperties.LambdaConfig.ApiDefinition apiDefinition) {
         LambdaRestApi api = LambdaRestApi.Builder.create(scope, apiDefinition.getName())
                 .handler(lambdaFunction)
                 .build();
@@ -49,5 +52,12 @@ public class LambdaFunctionBuilder {
                 .addResource(apiDefinition.getPath().substring(1));
 
         apiDefinition.getMethods().forEach(method -> resource.addMethod(method, new LambdaIntegration(lambdaFunction)));
+    }
+
+    private static Duration getTimeout(@Nullable Long defaultTimeout, @Nullable Long timeout) {
+        return Optional.ofNullable(timeout)
+                .or(() -> Optional.ofNullable(defaultTimeout))
+                .map(Duration::seconds)
+                .orElse(null);
     }
 }

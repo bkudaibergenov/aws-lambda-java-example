@@ -5,7 +5,7 @@ This project demonstrates the creation of AWS Lambda functions in Java, showcasi
 
 ## Project Structure
 
-- **lambda-commons**: Contains common utilities and configurations shared across Lambda functions.
+- **lambdas-sidecar**: Contains common utilities and configurations shared across Lambda functions.
 - **lambda-examples**: Contains example implementations of AWS Lambda functions using Java and custom annotations.
 
 ## Requirements

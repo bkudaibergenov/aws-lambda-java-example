@@ -1,6 +1,6 @@
 vpc:
   name: "MyVpc"
-  maxAzs: 2
+  maxAzs: 1
   natGateways: 1
   subnetConfiguration:
     - name: "PublicSubnet"

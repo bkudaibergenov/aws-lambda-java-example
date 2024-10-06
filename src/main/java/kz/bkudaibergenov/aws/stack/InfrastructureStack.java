@@ -10,22 +10,6 @@ import software.constructs.Construct;
 
 public class InfrastructureStack extends Stack {
 
-    //        Vpc vpc = Vpc.Builder.create(this, "MyVpc")
-//                .maxAzs(2)
-//                .build();
-//
-//        String secretKey = "3d38e9577ef44836bc447c4c19ae514f";
-//
-//        DatabaseInstance rdsInstance = DatabaseInstance.Builder.create(this, "PostgresRDSInstance")
-//                .engine(DatabaseInstanceEngine.postgres(
-//                        PostgresInstanceEngineProps.builder().version(PostgresEngineVersion.VER_14_12).build()))
-//                .instanceType(InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.MICRO))
-//                .vpc(vpc)
-//                .credentials(Credentials.fromPassword("lambda_user", SecretValue.unsafePlainText(secretKey)))
-//                .allocatedStorage(20)
-//                .databaseName("mydatabase")
-//                .build();
-
     public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
     }

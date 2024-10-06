@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group = 'kz.bkudaibergenov.aws'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    postgresqlVersion = '42.2.23'
+}
+
+dependencies {
+    implementation project(':lambdas-sidecar')
+    implementation "org.postgresql:postgresql:${postgresqlVersion}"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    archiveBaseName.set('lambda-postgresql')
+    archiveFileName.set('lambda-postgresql.jar')
+    manifest {
+        attributes(
+                'Main-Class': 'kz.bkudaibergenov.aws.examples.lambda.LambdaPostgresql'
+        )
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
