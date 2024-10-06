@@ -39,7 +39,19 @@ dependencies {
     implementation "org.yaml:snakeyaml:${snakeyamlVersion}"
 
     implementation project(':lambda-commons')
-    implementation project(':lambda-examples')
+    implementation project(':lambda-plain-text')
+    implementation project(':lambda-plain-text-created')
+    implementation project(':lambda-greet-user-by-name-and-age')
+    implementation project(':lambda-json-example')
+    implementation project(':lambda-response-with-headers-status')
+    implementation project(':lambda-redirect-url')
+    implementation project(':lambda-greet-user-query')
+    implementation project(':lambda-greet-user-request-body')
+    implementation project(':lambda-download-file')
+    implementation project(':lambda-handle-request-headers')
+    implementation project(':lambda-process-json-array-response')
+    implementation project(':lambda-process-json-array')
+    implementation project(':lambda-postgresql')
 }
 
 task run(type: JavaExec) {

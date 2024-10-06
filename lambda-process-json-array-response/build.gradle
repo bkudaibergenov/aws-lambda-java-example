@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation project(':lambda-commons')
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    archiveBaseName.set('lambda-process-json-array-response')
+    archiveFileName.set('lambda-process-json-array-response.jar')
+    manifest {
+        attributes(
+                'Main-Class': 'kz.bkudaibergenov.aws.examples.lambda.LambdaProcessJsonArrayResponse'
+        )
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

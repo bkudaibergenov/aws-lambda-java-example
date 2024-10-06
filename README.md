@@ -130,7 +130,7 @@ The configuration for Lambda functions is stored in `resources/lambdas-config.ya
 ```yaml
 lambdas:
   - name: "ExampleFunction"
-    handler: "kz.bkudaibergenov.aws.examples.lambda.ExampleLambda::handleRequest"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaPlainText::handleRequest"
     codePath: "./lambda-examples/build/libs/example-lambda.jar"
     api:
       name: "ExampleApi"

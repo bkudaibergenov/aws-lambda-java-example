@@ -1,8 +1,105 @@
 lambdas:
-  - name: "ExampleFunction"
-    handler: "kz.bkudaibergenov.aws.examples.lambda.ExampleLambda::handleRequest"
-    codePath: "./lambda-examples/build/libs/example-lambda.jar"
+  - name: "PlainTextFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaPlainText::handleRequest"
+    codePath: "./lambda-plain-text/build/libs/lambda-plain-text.jar"
+    timeout: 90
     api:
-      name: "ExampleApi"
-      path: "/example"
-      methods: ["GET", "POST"]
+      name: "PlainTextApi"
+      path: "/plain-text"
+      methods: ["GET"]
+
+  - name: "PlainTextCreatedFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaPlainTextCreated::handleRequest"
+    codePath: "./lambda-plain-text-created/build/libs/lambda-plain-text-created.jar"
+    api:
+      name: "PlainTextCreatedApi"
+      path: "/plain-text-created"
+      methods: ["POST"]
+
+  - name: "GreetUserByNameAndAgeFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaGreetUserByNameAndAge::handleRequest"
+    codePath: "./lambda-greet-user-by-name-and-age/build/libs/lambda-greet-user-by-name-and-age.jar"
+    api:
+      name: "GreetUserByNameAndAgeApi"
+      path: "/greet"
+      methods: ["GET"]
+
+  - name: "JsonExampleFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaJsonExample::handleRequest"
+    codePath: "./lambda-json-example/build/libs/lambda-json-example.jar"
+    api:
+      name: "JsonExampleApi"
+      path: "/json-example"
+      methods: ["GET"]
+
+  - name: "ResponseWithHeadersAndStatusCodeFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaResponseWithHeadersAndStatus::handleRequest"
+    codePath: "./lambda-response-with-headers-status/build/libs/lambda-response-with-headers-status.jar"
+    api:
+      name: "ResponseWithHeadersAndStatusCodeApi"
+      path: "/response-with-headers"
+      methods: ["GET"]
+
+  - name: "RedirectUrlFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaRedirectUrl::handleRequest"
+    codePath: "./lambda-redirect-url/build/libs/lambda-redirect-url.jar"
+    api:
+      name: "RedirectUrlApi"
+      path: "/redirect"
+      methods: ["GET"]
+
+  - name: "GreetUserQueryFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaGreetUserQuery::handleRequest"
+    codePath: "./lambda-greet-user-query/build/libs/lambda-greet-user-query.jar"
+    api:
+      name: "GreetUserQueryApi"
+      path: "/greet-query"
+      methods: ["GET"]
+
+  - name: "GreetUserRequestBodyFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaGreetUserRequestBody::handleRequest"
+    codePath: "./lambda-greet-user-request-body/build/libs/lambda-greet-user-request-body.jar"
+    api:
+      name: "GreetUserRequestBodyApi"
+      path: "/greet-request-body"
+      methods: ["POST"]
+
+  - name: "DownloadFileFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaDownloadFile::handleRequest"
+    codePath: "./lambda-download-file/build/libs/lambda-download-file.jar"
+    api:
+      name: "DownloadFileApi"
+      path: "/download-file"
+      methods: ["GET"]
+
+  - name: "HandleRequestHeadersFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaHandleRequestHeaders::handleRequest"
+    codePath: "./lambda-handle-request-headers/build/libs/lambda-handle-request-headers.jar"
+    api:
+      name: "HandleRequestHeadersApi"
+      path: "/handle-headers"
+      methods: ["GET"]
+
+  - name: "ProcessJsonArrayResponseFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaProcessJsonArrayResponse::handleRequest"
+    codePath: "./lambda-process-json-array-response/build/libs/lambda-process-json-array-response.jar"
+    api:
+      name: "ProcessJsonArrayResponseApi"
+      path: "/process-json-array-response"
+      methods: ["POST"]
+
+  - name: "ProcessJsonArrayFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaProcessJsonArray::handleRequest"
+    codePath: "./lambda-process-json-array/build/libs/lambda-process-json-array.jar"
+    api:
+      name: "ProcessJsonArrayApi"
+      path: "/process-json-array"
+      methods: ["POST"]
+
+  - name: "PostgresqlFunction"
+    handler: "kz.bkudaibergenov.aws.examples.lambda.LambdaPostgresql::handleRequest"
+    codePath: "./lambda-postgresql/build/libs/lambda-postgresql.jar"
+    api:
+      name: "PostgresqlApi"
+      path: "/postgresql"
+      methods: ["POST"]

@@ -1,0 +1,12 @@
+vpc:
+  name: "MyVpc"
+  maxAzs: 2
+  natGateways: 1
+  subnetConfiguration:
+    - name: "PublicSubnet"
+      type: "PUBLIC"
+    - name: "PrivateSubnet"
+      type: "PRIVATE_WITH_EGRESS"
+  gatewayEndpoints:
+    - service: "S3"
+

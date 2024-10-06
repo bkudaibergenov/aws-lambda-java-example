@@ -1,18 +1,30 @@
 package kz.bkudaibergenov.aws.stack;
 
-import kz.bkudaibergenov.aws.lambda.model.LambdaConfig;
-import kz.bkudaibergenov.aws.lambda.util.LambdaConfigLoader;
+import kz.bkudaibergenov.aws.lambda.model.LambdaRegistration;
+import kz.bkudaibergenov.aws.lambda.register.RegistrationLambda;
+import kz.bkudaibergenov.aws.vpc.builder.VpcBuilder;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.services.apigateway.LambdaIntegration;
-import software.amazon.awscdk.services.apigateway.LambdaRestApi;
-import software.amazon.awscdk.services.apigateway.Resource;
-import software.amazon.awscdk.services.lambda.Code;
-import software.amazon.awscdk.services.lambda.Function;
-import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.ec2.Vpc;
 import software.constructs.Construct;
 
 public class InfrastructureStack extends Stack {
+
+    //        Vpc vpc = Vpc.Builder.create(this, "MyVpc")
+//                .maxAzs(2)
+//                .build();
+//
+//        String secretKey = "3d38e9577ef44836bc447c4c19ae514f";
+//
+//        DatabaseInstance rdsInstance = DatabaseInstance.Builder.create(this, "PostgresRDSInstance")
+//                .engine(DatabaseInstanceEngine.postgres(
+//                        PostgresInstanceEngineProps.builder().version(PostgresEngineVersion.VER_14_12).build()))
+//                .instanceType(InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.MICRO))
+//                .vpc(vpc)
+//                .credentials(Credentials.fromPassword("lambda_user", SecretValue.unsafePlainText(secretKey)))
+//                .allocatedStorage(20)
+//                .databaseName("mydatabase")
+//                .build();
 
     public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
@@ -21,25 +33,12 @@ public class InfrastructureStack extends Stack {
     public InfrastructureStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
-        LambdaConfig config = LambdaConfigLoader.loadLambdaConfig();
+        Vpc vpc = VpcBuilder.buildVpc(this);
 
-        for (LambdaConfig.LambdaDefinition lambdaDefinition : config.getLambdas()) {
-            Function lambdaFunction = Function.Builder.create(this, lambdaDefinition.getName())
-                    .runtime(Runtime.JAVA_17)
-                    .handler(lambdaDefinition.getHandler())
-                    .code(Code.fromAsset(lambdaDefinition.getCodePath()))
-                    .build();
+        LambdaRegistration lambdaRegistration = new LambdaRegistration.Builder()
+                .vpc(vpc)
+                .build();
 
-            if (lambdaDefinition.getApi() != null) {
-                LambdaRestApi api = LambdaRestApi.Builder.create(this, lambdaDefinition.getApi().getName())
-                        .handler(lambdaFunction)
-                        .build();
-
-                Resource resource = api.getRoot().addResource(lambdaDefinition.getApi().getPath().substring(1));
-                for (String method : lambdaDefinition.getApi().getMethods()) {
-                    resource.addMethod(method, new LambdaIntegration(lambdaFunction));
-                }
-            }
-        }
+        RegistrationLambda.register(this, lambdaRegistration);
     }
 }
