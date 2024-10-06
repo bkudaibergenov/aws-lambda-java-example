@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    implementation 'com.amazonaws:aws-lambda-java-events:3.11.0'
+    implementation 'software.amazon.awssdk:rds:2.17.100'
+    implementation 'software.amazon.awssdk:secretsmanager:2.17.100'
+    implementation 'org.postgresql:postgresql:42.3.5' // Драйвер для PostgreSQL
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+    archiveFileName = 'lambda-function.zip'
+}
+
+build.dependsOn buildZip

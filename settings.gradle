@@ -13,3 +13,7 @@ include 'lambda-handle-request-headers'
 include 'lambda-process-json-array-response'
 include 'lambda-process-json-array'
 include 'lambda-postgresql'
+include 'lambda-db-init'
+include 'lambda-db-get'
+include 'lambda-db-post'
+

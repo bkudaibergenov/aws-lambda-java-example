@@ -20,6 +20,7 @@ public class LambdaPostgresql implements LambdaFunctionHandler {
     @LambdaFunction()
     public ResponseEntity<?> execute(@QueryParam("name") String name, @QueryParam("age") Integer age) {
 
+        System.getenv("host");
         Connection conn = null;
         Statement stmt = null;
         PreparedStatement pstmt = null;
