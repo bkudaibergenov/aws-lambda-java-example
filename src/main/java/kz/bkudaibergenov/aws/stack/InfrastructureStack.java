@@ -7,17 +7,15 @@ package kz.bkudaibergenov.aws.stack;
 import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.services.ec2.Vpc;
-import software.amazon.awscdk.services.rds.*;
-import software.amazon.awscdk.services.ec2.InstanceClass;
-import software.amazon.awscdk.services.ec2.InstanceSize;
+import software.amazon.awscdk.services.apigateway.LambdaIntegration;
+import software.amazon.awscdk.services.apigateway.LambdaRestApi;
 import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ec2.*;
+import software.amazon.awscdk.services.iam.PolicyStatement;
+import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
-import software.amazon.awscdk.services.lambda.Code;
-import software.amazon.awscdk.services.apigateway.LambdaRestApi;
-import software.amazon.awscdk.services.apigateway.LambdaIntegration;
-import software.amazon.awscdk.services.iam.PolicyStatement;
+import software.amazon.awscdk.services.rds.*;
 import software.constructs.Construct;
 
 import java.util.List;
@@ -48,29 +46,25 @@ public class InfrastructureStack extends Stack {
     public InfrastructureStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
-        //Vpc vpc = VpcBuilder.buildVpc(this);
-
-
-        //LambdaRegistration lambdaRegistration = new LambdaRegistration.Builder()
-        //           .vpc(vpc)
-        //           .build();
-
-
-
-        //RegistrationLambda.register(this, lambdaRegistration);
-
-
-
         // Создание VPC
         Vpc vpc = Vpc.Builder.create(this, "MyVpc")
                 .maxAzs(2) // Используем минимальное количество зон доступности
+                .natGateways(1)
                 .build();
+
 
         // Упрощенные учетные данные для базы данных
         String dbUser = "lambda_user";
         SecretValue dbPassword = SecretValue.unsafePlainText("lambda_password");
 
+        // Добавление Security Group для RDS
+        SecurityGroup rdsSecurityGroup = SecurityGroup.Builder.create(this, "RDSSecurityGroup")
+                .vpc(vpc)
+                .allowAllOutbound(true) // Разрешить исходящие соединения
+                .build();
 
+        //Разрешить соединения на порт 5432 (PostgreSQL)
+        rdsSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(5432), "Allow PostgreSQL access");
 
 
         // Создание RDS PostgreSQL базы данных с минимальными ресурсами
@@ -80,9 +74,11 @@ public class InfrastructureStack extends Stack {
                         .build()))
                 .instanceType(InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.MICRO)) // Самый маленький тип инстанса
                 .vpc(vpc)
+                .vpcSubnets(SubnetSelection.builder().subnetType(SubnetType.PRIVATE_WITH_NAT).build()) // Приватные подсети
                 .credentials(Credentials.fromPassword(dbUser, dbPassword)) // Простые учетные данные
-                .allocatedStorage(5) // Минимальный объем хранилища (5 GB)
-                .databaseName("mydatabase") // Имя базы данных
+                .allocatedStorage(5) // Хранилище
+                .securityGroups(List.of(rdsSecurityGroup)) // Применение Security Group
+                .databaseName("mydatabase")
                 .build();
 
 
@@ -94,6 +90,7 @@ public class InfrastructureStack extends Stack {
                 .memorySize(128)
                 .timeout(software.amazon.awscdk.Duration.seconds(100))
                 .vpc(vpc)
+                .vpcSubnets(SubnetSelection.builder().subnetType(SubnetType.PRIVATE_WITH_NAT).build()) // Приватная подсеть с NAT
                 .environment(Map.of(
                         "DB_HOST", rdsInstance.getDbInstanceEndpointAddress(),
                         "DB_PORT", rdsInstance.getDbInstanceEndpointPort(),
@@ -102,7 +99,6 @@ public class InfrastructureStack extends Stack {
                         "DB_PASSWORD", dbPassword.unsafeUnwrap()
                 ))
                 .build();
-
 
         // Добавляем вызов Lambda после создания базы данных
         initDBLambda.getNode().addDependency(rdsInstance);
@@ -115,7 +111,6 @@ public class InfrastructureStack extends Stack {
         initDBLambda.addToRolePolicy(initRdsPolicy);
 
 
-
         // Lambda для POST (добавление пользователя в базу данных) с минимальными ресурсами
         Function postLambda = Function.Builder.create(this, "PostUserDBLambda")
                 .runtime(Runtime.JAVA_17)
@@ -124,6 +119,7 @@ public class InfrastructureStack extends Stack {
                 .memorySize(128)
                 .timeout(software.amazon.awscdk.Duration.seconds(100))
                 .vpc(vpc)
+                .vpcSubnets(SubnetSelection.builder().subnetType(SubnetType.PRIVATE_WITH_NAT).build()) // Приватная подсеть с NAT
                 .environment(Map.of(
                         "DB_HOST", rdsInstance.getDbInstanceEndpointAddress(),
                         "DB_PORT", rdsInstance.getDbInstanceEndpointPort(),
@@ -141,6 +137,7 @@ public class InfrastructureStack extends Stack {
                 .memorySize(128)
                 .timeout(software.amazon.awscdk.Duration.seconds(100))
                 .vpc(vpc)
+                .vpcSubnets(SubnetSelection.builder().subnetType(SubnetType.PRIVATE_WITH_NAT).build()) // Приватная подсеть с NAT
                 .environment(Map.of(
                         "DB_HOST", rdsInstance.getDbInstanceEndpointAddress(),
                         "DB_PORT", rdsInstance.getDbInstanceEndpointPort(),
@@ -155,6 +152,7 @@ public class InfrastructureStack extends Stack {
                 .actions(List.of("rds-data:*"))
                 .resources(List.of(rdsInstance.getInstanceArn()))
                 .build();
+        initDBLambda.addToRolePolicy(rdsPolicy);
         postLambda.addToRolePolicy(rdsPolicy);
         getLambda.addToRolePolicy(rdsPolicy);
 

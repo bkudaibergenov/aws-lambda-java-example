@@ -5,12 +5,13 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.util.HashMap;
 import java.util.Map;
 
-public class PostUserHandler implements RequestHandler<Map<String, String>, String> {
+public class PostUserHandler implements RequestHandler<Map<String, Object>, Map<String, Object>> {
 
     @Override
-    public String handleRequest(Map<String, String> event, Context context) {
+    public Map<String, Object> handleRequest(Map<String, Object> event, Context context) {
         // Получаем параметры для подключения к базе данных из переменных окружения
         String dbHost = System.getenv("DB_HOST");
         String dbPort = System.getenv("DB_PORT");
@@ -21,11 +22,13 @@ public class PostUserHandler implements RequestHandler<Map<String, String>, Stri
         // JDBC URL для PostgreSQL
         String jdbcUrl = String.format("jdbc:postgresql://%s:%s/%s", dbHost, dbPort, dbName);
 
+        String responeBody;
+
         try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword)) {
 
             // Получаем данные из входного события Lambda (event)
-            String name = event.get("name");
-            String surname = event.get("surname");
+            String name = (String) event.get("name");
+            String surname = (String) event.get("surname");
 
             // SQL-запрос для добавления нового пользователя
             String insertSQL = "INSERT INTO users (name, surname) VALUES (?, ?)";
@@ -34,10 +37,19 @@ public class PostUserHandler implements RequestHandler<Map<String, String>, Stri
             preparedStatement.setString(2, surname);
             preparedStatement.executeUpdate();
 
-            return "User added successfully";
+
+
+            responeBody = "User added successfully";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error adding user: " + e.getMessage();
+            responeBody = "Error adding user: " + e.getMessage();
         }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("statusCode", 200);
+        response.put("body", responeBody);
+        response.put("headers", Map.of("Content-Type", "application/json"));
+
+        return response;
     }
 }
